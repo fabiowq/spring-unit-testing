@@ -18,7 +18,6 @@ package com.example.spring.unittesting;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -33,14 +32,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.example.spring.unittesting.Task;
+import com.example.spring.unittesting.TaskService;
+
 @RunWith(SpringRunner.class)
-@WebMvcTest(TaskController.class)
-public class TaskControllerTest {
+@SpringBootTest
+@AutoConfigureMockMvc
+public class TaskControllerSpringBootTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -62,7 +66,6 @@ public class TaskControllerTest {
 		); 
 		when(service.findAll()).thenReturn(tasks);
 		mockMvc.perform(get("/tasks")).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(tasks.size())));
-		verify(service).findAll();
 	}
 	
 	@Test
@@ -74,7 +77,6 @@ public class TaskControllerTest {
 	 			Optional.of(new Task(taskId, "Code Junit", 10))
 	 		);		
 		mockMvc.perform(get("/tasks/" + taskId)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.id", is(taskId)));
-		verify(service).findById(taskId);
 	}
 	
 	@Test
@@ -85,7 +87,6 @@ public class TaskControllerTest {
 	 			Optional.empty()
 	 		);		
 		mockMvc.perform(get("/tasks/" + taskId)).andDo(print()).andExpect(status().isNotFound());
-		verify(service).findById(taskId);
 	}
 
 }
